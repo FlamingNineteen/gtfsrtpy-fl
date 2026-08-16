@@ -1,0 +1,70 @@
+import gtfs_realtime_pb2 as gtfs_rt
+from utils import *
+
+import json
+import requests
+import time
+
+def GetVehiclePositions():
+    gtfsrt = gtfs_rt.FeedMessage()
+    
+    header = gtfs_rt.FeedHeader()
+    header.gtfs_realtime_version = '2.0'
+    header.incrementality = gtfs_rt.FeedHeader.Incrementality.FULL_DATASET
+    header.timestamp = int(time.time())
+    gtfsrt.header.CopyFrom(header)
+
+    uniqueid = 0
+
+    # Availtec API
+    for url in (
+        'realtimevotran.availtec.com',
+        'realtimesuntran.availtec.com',
+        'www.ccbusinfo.com',
+    ):
+        print(url)
+        
+        get = requests.get(f'https://{url}/InfoPoint/rest/Routes/GetVisibleRoutes').text
+        son = json.loads(get)
+
+        for route in son:
+            for busdict in route.get('Vehicles'):
+                entity    = gtfs_rt.FeedEntity()
+                entity.id = str(uniqueid)
+                uniqueid += 1
+
+                vehicle = gtfs_rt.VehiclePosition()
+
+                trip          = gtfs_rt.TripDescriptor()
+                trip.trip_id  = str(busdict.get('TripId'))
+                trip.route_id = str(busdict.get('RouteId'))
+                vehicle.trip.CopyFrom(trip)
+
+                desc       = gtfs_rt.VehicleDescriptor()
+                desc.id    = str(busdict.get('VehicleId'))
+                desc.label = busdict.get('Name')
+                vehicle.vehicle.CopyFrom(desc)
+
+                position           = gtfs_rt.Position()
+                position.latitude  = busdict.get('Latitude')
+                position.longitude = busdict.get('Longitude')
+                position.speed     = busdict.get('Speed')
+                vehicle.position.CopyFrom(position)
+
+                vehicle.stop_id   = str(busdict.get('StopId'))
+                vehicle.timestamp = formatdate(busdict.get('LastUpdated'))
+
+                entity.vehicle.CopyFrom(vehicle)
+
+                gtfsrt.entity.add().CopyFrom(entity)
+
+    return gtfsrt
+
+if __name__ == '__main__':
+    result = GetVehiclePositions()
+
+    with open("vehiclepositions.pb", "wb") as f:
+        f.write(result.SerializeToString())
+    
+    with open('vehiclepositions.txt', 'w') as f:
+        f.write(str(result))

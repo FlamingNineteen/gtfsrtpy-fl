@@ -1,0 +1,13 @@
+# Output files
+gtfs_realtime_pb2.py
+*.pb
+
+# Testing files
+*.json
+*.txt
+
+# Python virtual environment
+.venv/
+
+# Cache
+__pycache__/
