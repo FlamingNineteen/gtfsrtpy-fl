@@ -17,10 +17,10 @@ def GetAlerts():
     uniqueid = 0
 
     # Availtec API
-    for url in (
-        'realtimevotran.availtec.com',
-        'realtimesuntran.availtec.com',
-        'www.ccbusinfo.com',
+    for agency_id, url in (
+        ('127', 'realtimevotran.availtec.com'),
+        ('40120', 'realtimesuntran.availtec.com'),
+        ('1752', 'www.ccbusinfo.com'),
     ):
         print(url)
         
@@ -40,8 +40,11 @@ def GetAlerts():
             alert.active_period.add().CopyFrom(timerange)
 
             informed = gtfs_rt.EntitySelector()
+            informed.agency_id = agency_id
+            alert.informed_entity.add().CopyFrom(informed)
 
             alert.header_text.CopyFrom(transtr(alertdict.get('Header')))
+            alert.description_text.CopyFrom(transtr(alertdict.get('Message')))
 
             entity.alert.CopyFrom(alert)
             
