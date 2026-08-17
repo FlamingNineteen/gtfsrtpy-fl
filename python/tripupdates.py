@@ -5,17 +5,7 @@ import json
 import requests
 import time
 
-def GetTripUpdates():
-    gtfsrt = gtfs_rt.FeedMessage()
-        
-    header = gtfs_rt.FeedHeader()
-    header.gtfs_realtime_version = '2.0'
-    header.incrementality = gtfs_rt.FeedHeader.Incrementality.FULL_DATASET
-    header.timestamp = int(time.time())
-    gtfsrt.header.CopyFrom(header)
-
-    uniqueid = 0
-
+def GetTripUpdates(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0):
     # Availtec API
     for url in (
         'realtimevotran.availtec.com',
@@ -54,7 +44,9 @@ def GetTripUpdates():
     return gtfsrt
 
 if __name__ == '__main__':
-    result = GetTripUpdates()
+    result = gtfs_rt.FeedMessage()
+    result.header.CopyFrom(GetHeader())
+    result = GetTripUpdates(result)
 
     with open('tripupdates.pb', 'wb') as file:
         file.write(result.SerializeToString())

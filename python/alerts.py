@@ -5,17 +5,7 @@ import json
 import requests
 import time
 
-def GetAlerts():
-    gtfsrt = gtfs_rt.FeedMessage()
-    
-    header = gtfs_rt.FeedHeader()
-    header.gtfs_realtime_version = '2.0'
-    header.incrementality = gtfs_rt.FeedHeader.Incrementality.FULL_DATASET
-    header.timestamp = int(time.time())
-    gtfsrt.header.CopyFrom(header)
-
-    uniqueid = 0
-
+def GetAlerts(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0):
     # Availtec API
     for agency_id, url in (
         ('127', 'realtimevotran.availtec.com'),
@@ -59,7 +49,9 @@ def GetAlerts():
     return gtfsrt
 
 if __name__ == '__main__':
-    result = GetAlerts()
+    result = gtfs_rt.FeedMessage()
+    result.header.CopyFrom(GetHeader())
+    result = GetAlerts(result)
 
     with open("alerts.pb", "wb") as f:
         f.write(result.SerializeToString())

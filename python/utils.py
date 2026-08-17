@@ -1,5 +1,7 @@
 import gtfs_realtime_pb2 as gtfs_rt
 
+import time
+
 def formatdate(date: str):
     return int(date.split('Date(')[1].split('-')[0])//1000
 
@@ -9,6 +11,13 @@ def transtr(s):
     translate.text = str(s)
     transtr.translation.add().CopyFrom(translate)
     return(transtr)
+
+def GetHeader():
+    header = gtfs_rt.FeedHeader()
+    header.gtfs_realtime_version = '2.0'
+    header.incrementality = gtfs_rt.FeedHeader.Incrementality.FULL_DATASET
+    header.timestamp = int(time.time())
+    return header
 
 VEHICLE_OCCUPANCIES = (
     gtfs_rt.VehiclePosition.OccupancyStatus.EMPTY,
