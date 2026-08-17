@@ -5,14 +5,14 @@ import json
 import requests
 import time
 
-def GetVehiclePositions(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0):
+def GetVehiclePositions(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0, debug: bool = False):
     # Availtec API
     for url in (
         'realtimevotran.availtec.com',
         'realtimesuntran.availtec.com',
         'www.ccbusinfo.com',
     ):
-        print(url)
+        if debug: print(url)
         
         get = requests.get(f'https://{url}/InfoPoint/rest/Routes/GetVisibleRoutes').text
         son = json.loads(get)
@@ -58,7 +58,7 @@ def GetVehiclePositions(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0):
 if __name__ == '__main__':
     result = gtfs_rt.FeedMessage()
     result.header.CopyFrom(GetHeader())
-    result = GetVehiclePositions(result)
+    GetVehiclePositions(result)
 
     with open("vehiclepositions.pb", "wb") as f:
         f.write(result.SerializeToString())

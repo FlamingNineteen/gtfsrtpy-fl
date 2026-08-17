@@ -5,14 +5,14 @@ import json
 import requests
 import time
 
-def GetTripUpdates(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0):
+def GetTripUpdates(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0, debug: bool = False):
     # Availtec API
     for url in (
         'realtimevotran.availtec.com',
         'realtimesuntran.availtec.com',
         'www.ccbusinfo.com',
     ):
-        print(url)
+        if debug: print(url)
         
         get = requests.get(f'https://{url}/InfoPoint/rest/Routes/GetVisibleRoutes').text
         son = json.loads(get)
@@ -46,7 +46,7 @@ def GetTripUpdates(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0):
 if __name__ == '__main__':
     result = gtfs_rt.FeedMessage()
     result.header.CopyFrom(GetHeader())
-    result = GetTripUpdates(result)
+    GetTripUpdates(result)
 
     with open('tripupdates.pb', 'wb') as file:
         file.write(result.SerializeToString())

@@ -5,14 +5,14 @@ import json
 import requests
 import time
 
-def GetAlerts(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0):
+def GetAlerts(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0, debug: bool = False):
     # Availtec API
     for agency_id, url in (
         ('127', 'realtimevotran.availtec.com'),
         ('40120', 'realtimesuntran.availtec.com'),
         ('1752', 'www.ccbusinfo.com'),
     ):
-        print(url)
+        if debug: print(url)
         
         get = requests.get(f'https://{url}/InfoPoint/rest/PublicMessages/GetCurrentMessages').text
         son = json.loads(get)
@@ -51,7 +51,7 @@ def GetAlerts(gtfsrt: gtfs_rt.FeedMessage, uniqueid: int = 0):
 if __name__ == '__main__':
     result = gtfs_rt.FeedMessage()
     result.header.CopyFrom(GetHeader())
-    result = GetAlerts(result)
+    GetAlerts(result)
 
     with open("alerts.pb", "wb") as f:
         f.write(result.SerializeToString())
