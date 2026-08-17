@@ -43,6 +43,12 @@ def GetAlerts():
             informed.agency_id = agency_id
             alert.informed_entity.add().CopyFrom(informed)
 
+            alert.cause  = ALERT_CAUSES[alertdict.get('Cause')-1]
+            alert.cause_detail.CopyFrom(transtr(alertdict.get('CauseReportLabel')))
+            
+            alert.effect = ALERT_EFFECTS[alertdict.get('Effect')-1]
+            alert.effect_detail.CopyFrom(transtr(alertdict.get('CauseReportLabel')))
+
             alert.header_text.CopyFrom(transtr(alertdict.get('Header')))
             alert.description_text.CopyFrom(transtr(alertdict.get('Message')))
 

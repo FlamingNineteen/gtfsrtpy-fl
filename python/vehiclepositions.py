@@ -51,8 +51,13 @@ def GetVehiclePositions():
                 position.speed     = busdict.get('Speed')
                 vehicle.position.CopyFrom(position)
 
-                vehicle.stop_id   = str(busdict.get('StopId'))
-                vehicle.timestamp = formatdate(busdict.get('LastUpdated'))
+                vehicle.stop_id          = str(busdict.get('StopId'))
+                vehicle.timestamp        = formatdate(busdict.get('LastUpdated'))
+                vehicle.occupancy_status = VEHICLE_OCCUPANCIES[busdict.get('OccupancyStatus')]
+
+                if ('OnBoard' in busdict and 'TotalCapacity' in busdict):
+                    if (busdict.get('OnBoard') != None and busdict.get('TotalCapacity') != None):
+                        vehicle.occupancy_percentage = busdict.get('OnBoard')*100 // busdict.get('TotalCapacity')
 
                 entity.vehicle.CopyFrom(vehicle)
 
